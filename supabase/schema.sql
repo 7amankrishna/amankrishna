@@ -83,6 +83,15 @@ create table if not exists public.posts (
 
 alter table public.posts enable row level security;
 
+-- Migration for tables created by an older version of this schema:
+-- bring posts up to the block-based shape if columns are missing.
+alter table public.posts add column if not exists blocks jsonb not null default '[]';
+alter table public.posts add column if not exists seo_title text;
+alter table public.posts add column if not exists seo_description text;
+alter table public.posts add column if not exists cover_image text;
+alter table public.posts add column if not exists updated_at timestamptz not null default now();
+alter table public.posts drop column if exists content;
+
 -- Helper: is the current JWT the site admin?
 create or replace function public.is_admin()
 returns boolean
@@ -92,6 +101,8 @@ as $$
 $$;
 
 drop policy if exists "published posts are public" on public.posts;
+-- old v1 policy name — must go, it granted all authenticated users write access
+drop policy if exists "admins manage posts" on public.posts;
 create policy "published posts are public"
   on public.posts for select
   to anon, authenticated
