@@ -63,9 +63,18 @@
   color-scheme: dark;
 }
 
+/* Light theme: every token is re-derived for contrast on near-white.
+   Accents are darkened so text/icons hit WCAG AA (≥4.5:1) on #f7f7f8. */
 .light {
-  --bg: #fafafa;
-  --txt: #101014;
+  --color-ink: #f7f7f8;
+  --color-ink-2: #ffffff;
+  --color-surface: rgba(16, 16, 24, 0.04);
+  --color-line: rgba(16, 16, 24, 0.12);
+  --color-fg: #16161d;
+  --color-muted: #545460;
+  --color-violet: #5b34e8;
+  --color-blue: #1d54d0;
+  --color-cyan: #0e7490;
   color-scheme: light;
 }
 
@@ -107,6 +116,9 @@ body {
   opacity: 0.035;
   background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='200' height='200'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='3'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");
 }
+.light .noise::before {
+  opacity: 0.02;
+}
 
 /* Glass card */
 .glass {
@@ -124,12 +136,18 @@ body {
     linear-gradient(var(--color-ink-2), var(--color-ink-2)) padding-box,
     linear-gradient(
         135deg,
-        rgba(124, 92, 255, 0.5),
-        rgba(255, 255, 255, 0.06) 40%,
-        rgba(34, 211, 238, 0.4)
+        color-mix(in srgb, var(--color-violet) 50%, transparent),
+        var(--color-line) 40%,
+        color-mix(in srgb, var(--color-cyan) 40%, transparent)
       )
       border-box;
   border: 1px solid transparent;
+}
+
+/* Softer elevation for cards in light mode */
+.light .g-border,
+.light .glass {
+  box-shadow: 0 1px 2px rgba(16, 16, 24, 0.05), 0 8px 24px rgba(16, 16, 24, 0.06);
 }
 
 /* Gradient text */

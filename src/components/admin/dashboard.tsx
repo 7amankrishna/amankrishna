@@ -1,8 +1,9 @@
 "use client";
 
 import { useRouter } from "next/navigation";
+import Link from "next/link";
 import { createClient } from "@/lib/supabase/client";
-import { Inbox, FolderOpen, LogOut, Mail } from "lucide-react";
+import { Inbox, FolderOpen, LogOut, Mail, FileText } from "lucide-react";
 
 type Message = {
   id: string;
@@ -46,12 +47,20 @@ export function AdminDashboard({
           <h1 className="text-2xl font-semibold tracking-tight">Dashboard</h1>
           <p className="mt-1 text-sm text-muted">Signed in as {email}</p>
         </div>
-        <button
-          onClick={signOut}
-          className="glass flex items-center gap-2 px-4 py-2 text-sm text-muted transition-colors hover:text-fg"
-        >
-          <LogOut className="size-4" /> Sign out
-        </button>
+        <div className="flex items-center gap-3">
+          <Link
+            href="/admin/articles"
+            className="glass flex items-center gap-2 px-4 py-2 text-sm text-muted transition-colors hover:text-fg"
+          >
+            <FileText className="size-4" /> Articles
+          </Link>
+          <button
+            onClick={signOut}
+            className="glass flex items-center gap-2 px-4 py-2 text-sm text-muted transition-colors hover:text-fg"
+          >
+            <LogOut className="size-4" /> Sign out
+          </button>
+        </div>
       </header>
 
       {/* messages */}

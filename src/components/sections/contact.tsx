@@ -75,7 +75,7 @@ export function Contact() {
             <button
               type="submit"
               disabled={pending}
-              className="inline-flex w-full items-center justify-center gap-2 rounded-xl bg-fg py-3 text-sm font-medium text-ink transition-all hover:bg-white disabled:opacity-60 sm:w-auto sm:px-8"
+              className="inline-flex w-full items-center justify-center gap-2 rounded-xl bg-fg py-3 text-sm font-medium text-ink transition-all hover:opacity-90 disabled:opacity-60 sm:w-auto sm:px-8"
             >
               {pending ? <Loader2 className="size-4 animate-spin" /> : <Send className="size-4" />}
               {pending ? "Sending…" : "Send message"}

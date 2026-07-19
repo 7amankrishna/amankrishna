@@ -1,13 +1,13 @@
-import { redirect } from "next/navigation";
-import { createClient, supabaseConfigured } from "@/lib/supabase/server";
+import { requireAdmin, supabaseConfigured } from "@/lib/admin";
 import { AdminDashboard } from "@/components/admin/dashboard";
 
 export const metadata = { title: "Admin" };
 export const dynamic = "force-dynamic";
 
 /**
- * Admin dashboard — server-guarded by Supabase Auth.
- * Unauthenticated visitors are redirected to /login.
+ * Admin dashboard — server-guarded by Supabase Auth AND an email check;
+ * only the site owner's account gets in. RLS enforces the same rule
+ * at the database layer.
  */
 export default async function AdminPage() {
   if (!supabaseConfigured()) {
@@ -24,11 +24,7 @@ export default async function AdminPage() {
     );
   }
 
-  const supabase = await createClient();
-  const {
-    data: { user },
-  } = await supabase.auth.getUser();
-  if (!user) redirect("/login");
+  const { supabase, user } = await requireAdmin();
 
   const [{ data: messages }, { data: projects }] = await Promise.all([
     supabase

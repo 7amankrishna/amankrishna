@@ -4,8 +4,27 @@ A premium, dark-themed developer portfolio built with Next.js 15, React 19,
 TypeScript, Tailwind CSS 4, Framer Motion, React Three Fiber, and Supabase.
 
 **Live sections:** animated 3D hero · about · skills · projects · journey
-timeline · live GitHub stats · LinkedIn · contact form (Supabase) · admin
-dashboard (Supabase Auth).
+timeline · live GitHub stats · LinkedIn · contact form (Supabase) · blog with
+drag-and-drop article editor · admin dashboard (Supabase Auth, owner-only).
+
+## Blog & article editor
+
+Articles are written in a drag-and-drop block editor at `/admin/articles`
+(paragraph, heading, image, code, quote, list, divider blocks — drag the grip
+to reorder). Each article has:
+
+- **Permalink & slug** — auto-derived from the title, editable, validated
+  (`lowercase-with-dashes`), shown as a live permalink preview
+- **SEO** — SEO title, meta description, cover image, plus a Google-style
+  result preview; published articles emit canonical URLs, Open Graph and
+  Twitter cards via `generateMetadata`, and are added to `sitemap.xml`
+- **Draft/published** state — only published articles appear at `/blog/[slug]`
+
+**Admin access is restricted to one account** (`7amankrishna@gmail.com`):
+the server guard in `src/lib/admin.ts` redirects everyone else, and Supabase
+RLS policies enforce the same email check at the database layer — so data is
+protected even if the UI guard were bypassed. To change the admin email,
+update it in both `src/lib/admin.ts` and `supabase/schema.sql`.
 
 ## Quick start
 

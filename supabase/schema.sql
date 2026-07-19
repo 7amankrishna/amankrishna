@@ -19,11 +19,11 @@ create policy "anyone can submit a message"
   to anon, authenticated
   with check (true);
 
--- …but only authenticated users (you, the admin) can read them.
+-- …but only the site admin can read them.
 create policy "admins can read messages"
   on public.contact_messages for select
   to authenticated
-  using (true);
+  using ((auth.jwt() ->> 'email') = '7amankrishna@gmail.com');
 
 -- ------------------------------------------------------------
 -- Dynamic projects (public read of published rows, admin write)
@@ -51,35 +51,74 @@ create policy "published projects are public"
 create policy "admins manage projects"
   on public.projects for all
   to authenticated
-  using (true)
-  with check (true);
+  using ((auth.jwt() ->> 'email') = '7amankrishna@gmail.com')
+  with check ((auth.jwt() ->> 'email') = '7amankrishna@gmail.com');
 
 -- ------------------------------------------------------------
--- Blog-ready: posts table for future articles
+-- Blog articles — block-based content with SEO fields.
+-- Write access is restricted to THE admin (email check), not just
+-- any authenticated user.
 -- ------------------------------------------------------------
 create table if not exists public.posts (
   id uuid primary key default gen_random_uuid(),
-  slug text not null unique,
-  title text not null,
+  slug text not null unique check (slug ~ '^[a-z0-9]+(-[a-z0-9]+)*$'),
+  title text not null check (char_length(title) between 1 and 200),
   excerpt text,
-  content text,
+  -- ordered array of content blocks:
+  -- [{ "id": "...", "type": "paragraph"|"heading"|"image"|"code"|"quote"|"list"|"divider", ... }]
+  blocks jsonb not null default '[]',
+  -- SEO
+  seo_title text,
+  seo_description text,
+  cover_image text,
   published boolean not null default false,
   published_at timestamptz,
-  created_at timestamptz not null default now()
+  created_at timestamptz not null default now(),
+  updated_at timestamptz not null default now()
 );
 
 alter table public.posts enable row level security;
 
+-- Helper: is the current JWT the site admin?
+create or replace function public.is_admin()
+returns boolean
+language sql stable
+as $$
+  select coalesce(auth.jwt() ->> 'email', '') = '7amankrishna@gmail.com'
+$$;
+
 create policy "published posts are public"
   on public.posts for select
   to anon, authenticated
-  using (published = true);
+  using (published = true or public.is_admin());
 
-create policy "admins manage posts"
-  on public.posts for all
+create policy "only the admin writes posts"
+  on public.posts for insert
   to authenticated
-  using (true)
-  with check (true);
+  with check (public.is_admin());
+
+create policy "only the admin updates posts"
+  on public.posts for update
+  to authenticated
+  using (public.is_admin())
+  with check (public.is_admin());
+
+create policy "only the admin deletes posts"
+  on public.posts for delete
+  to authenticated
+  using (public.is_admin());
+
+-- keep updated_at fresh
+create or replace function public.touch_updated_at()
+returns trigger language plpgsql as $$
+begin
+  new.updated_at = now();
+  return new;
+end $$;
+
+drop trigger if exists posts_touch on public.posts;
+create trigger posts_touch before update on public.posts
+  for each row execute function public.touch_updated_at();
 
 -- Seed the two launch projects so the admin dashboard has data
 insert into public.projects (title, description, url, tags, gradient, published, sort_order)

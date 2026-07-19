@@ -72,7 +72,7 @@ export function Projects({ projects = defaultProjects }: { projects?: Project[] 
                     href={p.url}
                     target="_blank"
                     rel="noopener noreferrer"
-                    className="inline-flex items-center gap-2 rounded-full bg-fg px-5 py-2 text-sm font-medium text-ink transition-colors hover:bg-white"
+                    className="inline-flex items-center gap-2 rounded-full bg-fg px-5 py-2 text-sm font-medium text-ink transition-colors hover:opacity-90"
                   >
                     <ExternalLink className="size-4" /> {p.urlLabel ?? "Live Demo"}
                   </a>

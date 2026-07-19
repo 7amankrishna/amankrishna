@@ -67,7 +67,7 @@ export default function LoginPage() {
         <button
           type="submit"
           disabled={loading}
-          className="flex w-full items-center justify-center gap-2 rounded-xl bg-fg py-3 text-sm font-medium text-ink transition-colors hover:bg-white disabled:opacity-60"
+          className="flex w-full items-center justify-center gap-2 rounded-xl bg-fg py-3 text-sm font-medium text-ink transition-colors hover:opacity-90 disabled:opacity-60"
         >
           {loading && <Loader2 className="size-4 animate-spin" />}
           Sign in

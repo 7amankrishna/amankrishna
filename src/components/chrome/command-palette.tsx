@@ -12,6 +12,7 @@ import {
   Download,
   Moon,
   Sun,
+  Newspaper,
 } from "lucide-react";
 import { Github, Linkedin } from "@/components/ui/brand-icons";
 import { useTheme } from "next-themes";
@@ -45,6 +46,8 @@ export function CommandPalette({
     setOpen(false);
     if (href.startsWith("#")) {
       document.querySelector(href)?.scrollIntoView({ behavior: "smooth" });
+    } else if (href.startsWith("/") && !href.endsWith(".pdf")) {
+      window.location.href = href;
     } else {
       window.open(href, "_blank", "noopener,noreferrer");
     }
@@ -56,6 +59,7 @@ export function CommandPalette({
     { icon: Sparkles, label: "Skills", href: "#skills" },
     { icon: FolderOpen, label: "Projects", href: "#projects" },
     { icon: Map, label: "Journey", href: "#experience" },
+    { icon: Newspaper, label: "Blog", href: "/blog" },
     { icon: Mail, label: "Contact", href: "#contact" },
   ];
 
