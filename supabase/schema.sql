@@ -27,6 +27,12 @@ create policy "admins can read messages"
   to authenticated
   using ((auth.jwt() ->> 'email') = '7amankrishna@gmail.com');
 
+drop policy if exists "admins can delete messages" on public.contact_messages;
+create policy "admins can delete messages"
+  on public.contact_messages for delete
+  to authenticated
+  using ((auth.jwt() ->> 'email') = '7amankrishna@gmail.com');
+
 -- ------------------------------------------------------------
 -- Dynamic projects (public read of published rows, admin write)
 -- ------------------------------------------------------------
