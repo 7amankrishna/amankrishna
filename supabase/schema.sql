@@ -14,12 +14,14 @@ create table if not exists public.contact_messages (
 alter table public.contact_messages enable row level security;
 
 -- Anyone (anon) may submit a message…
+drop policy if exists "anyone can submit a message" on public.contact_messages;
 create policy "anyone can submit a message"
   on public.contact_messages for insert
   to anon, authenticated
   with check (true);
 
 -- …but only the site admin can read them.
+drop policy if exists "admins can read messages" on public.contact_messages;
 create policy "admins can read messages"
   on public.contact_messages for select
   to authenticated
@@ -43,11 +45,13 @@ create table if not exists public.projects (
 
 alter table public.projects enable row level security;
 
+drop policy if exists "published projects are public" on public.projects;
 create policy "published projects are public"
   on public.projects for select
   to anon, authenticated
   using (published = true);
 
+drop policy if exists "admins manage projects" on public.projects;
 create policy "admins manage projects"
   on public.projects for all
   to authenticated
@@ -87,22 +91,26 @@ as $$
   select coalesce(auth.jwt() ->> 'email', '') = '7amankrishna@gmail.com'
 $$;
 
+drop policy if exists "published posts are public" on public.posts;
 create policy "published posts are public"
   on public.posts for select
   to anon, authenticated
   using (published = true or public.is_admin());
 
+drop policy if exists "only the admin writes posts" on public.posts;
 create policy "only the admin writes posts"
   on public.posts for insert
   to authenticated
   with check (public.is_admin());
 
+drop policy if exists "only the admin updates posts" on public.posts;
 create policy "only the admin updates posts"
   on public.posts for update
   to authenticated
   using (public.is_admin())
   with check (public.is_admin());
 
+drop policy if exists "only the admin deletes posts" on public.posts;
 create policy "only the admin deletes posts"
   on public.posts for delete
   to authenticated
