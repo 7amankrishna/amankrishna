@@ -1,26 +1,194 @@
 @import "tailwindcss";
 
-:root {
-  --background: #ffffff;
-  --foreground: #171717;
-}
+/* ---------------------------------- */
+/* Design tokens                      */
+/* ---------------------------------- */
+@theme {
+  --color-ink: #050505;
+  --color-ink-2: #0a0a0c;
+  --color-surface: rgba(255, 255, 255, 0.03);
+  --color-line: rgba(255, 255, 255, 0.08);
+  --color-fg: #f5f5f7;
+  --color-muted: #8f8f98;
+  --color-violet: #7c5cff;
+  --color-blue: #4d7cfe;
+  --color-cyan: #22d3ee;
 
-@theme inline {
-  --color-background: var(--background);
-  --color-foreground: var(--foreground);
-  --font-sans: var(--font-geist-sans);
-  --font-mono: var(--font-geist-mono);
-}
+  --font-sans: var(--font-geist-sans), ui-sans-serif, system-ui, sans-serif;
+  --font-mono: var(--font-geist-mono), ui-monospace, monospace;
 
-@media (prefers-color-scheme: dark) {
-  :root {
-    --background: #0a0a0a;
-    --foreground: #ededed;
+  --animate-aurora: aurora 14s ease-in-out infinite alternate;
+  --animate-blink: blink 1s step-end infinite;
+  --animate-marquee: marquee 30s linear infinite;
+  --animate-float: float 6s ease-in-out infinite;
+
+  @keyframes aurora {
+    0% {
+      transform: translate(-10%, -6%) rotate(0deg) scale(1);
+    }
+    50% {
+      transform: translate(8%, 4%) rotate(8deg) scale(1.15);
+    }
+    100% {
+      transform: translate(-4%, 8%) rotate(-6deg) scale(1.05);
+    }
+  }
+  @keyframes blink {
+    50% {
+      opacity: 0;
+    }
+  }
+  @keyframes marquee {
+    to {
+      transform: translateX(-50%);
+    }
+  }
+  @keyframes float {
+    0%,
+    100% {
+      transform: translateY(0);
+    }
+    50% {
+      transform: translateY(-10px);
+    }
   }
 }
 
+/* ---------------------------------- */
+/* Base                               */
+/* ---------------------------------- */
+:root {
+  --bg: var(--color-ink);
+  --txt: var(--color-fg);
+  color-scheme: dark;
+}
+
+.light {
+  --bg: #fafafa;
+  --txt: #101014;
+  color-scheme: light;
+}
+
+html {
+  scroll-behavior: smooth;
+}
+
 body {
-  background: var(--background);
-  color: var(--foreground);
-  font-family: Arial, Helvetica, sans-serif;
+  background: var(--bg);
+  color: var(--txt);
+  font-family: var(--font-sans);
+  -webkit-font-smoothing: antialiased;
+  overflow-x: hidden;
+}
+
+::selection {
+  background: color-mix(in srgb, var(--color-violet) 40%, transparent);
+  color: #fff;
+}
+
+/* Visible keyboard focus */
+:focus-visible {
+  outline: 2px solid var(--color-cyan);
+  outline-offset: 3px;
+  border-radius: 4px;
+}
+
+/* ---------------------------------- */
+/* Utilities                          */
+/* ---------------------------------- */
+
+/* Film-grain noise overlay, pure CSS (SVG data URI) */
+.noise::before {
+  content: "";
+  position: fixed;
+  inset: 0;
+  z-index: 60;
+  pointer-events: none;
+  opacity: 0.035;
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='200' height='200'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='3'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");
+}
+
+/* Glass card */
+.glass {
+  background: var(--color-surface);
+  border: 1px solid var(--color-line);
+  backdrop-filter: blur(12px);
+  border-radius: 1rem;
+}
+
+/* Gradient border card (glows on hover) */
+.g-border {
+  position: relative;
+  border-radius: 1rem;
+  background:
+    linear-gradient(var(--color-ink-2), var(--color-ink-2)) padding-box,
+    linear-gradient(
+        135deg,
+        rgba(124, 92, 255, 0.5),
+        rgba(255, 255, 255, 0.06) 40%,
+        rgba(34, 211, 238, 0.4)
+      )
+      border-box;
+  border: 1px solid transparent;
+}
+
+/* Gradient text */
+.g-text {
+  background: linear-gradient(
+    100deg,
+    var(--color-fg) 20%,
+    var(--color-violet) 50%,
+    var(--color-cyan) 80%
+  );
+  background-clip: text;
+  -webkit-background-clip: text;
+  color: transparent;
+}
+
+/* Mono eyebrow label */
+.eyebrow {
+  font-family: var(--font-mono);
+  font-size: 0.75rem;
+  letter-spacing: 0.25em;
+  text-transform: uppercase;
+  color: var(--color-cyan);
+}
+
+/* Aurora blobs container.
+   Blobs are pre-blurred radial gradients — no `filter: blur()` cost,
+   which keeps compositing cheap on integrated GPUs. */
+.aurora {
+  position: absolute;
+  inset: 0;
+  overflow: hidden;
+  pointer-events: none;
+}
+.aurora > i {
+  position: absolute;
+  border-radius: 9999px;
+  opacity: 0.5;
+  background: radial-gradient(circle, var(--blob, #7c5cff) 0%, transparent 65%);
+  animation: var(--animate-aurora);
+  will-change: transform;
+}
+
+/* Hide native cursor only when custom cursor is active (fine pointers) */
+@media (pointer: fine) {
+  .custom-cursor-on,
+  .custom-cursor-on a,
+  .custom-cursor-on button {
+    cursor: none;
+  }
+}
+
+/* Reduced motion: kill all animation */
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+    scroll-behavior: auto !important;
+  }
 }
