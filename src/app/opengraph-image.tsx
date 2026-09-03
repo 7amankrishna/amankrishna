@@ -1,7 +1,14 @@
 import { ImageResponse } from "next/og";
 import { SITE } from "@/lib/utils";
 
-export const runtime = "edge";
+/**
+ * Site-wide Open Graph card.
+ *
+ * Runs on the Node runtime (the default). It used to declare
+ * `runtime = "edge"`, which forced the route to be rendered on every request —
+ * Next disables static generation for edge pages. Nothing here reads a request,
+ * so on Node it is prerendered once at build time instead.
+ */
 export const alt = `${SITE.name} — AI/ML & Full-Stack Developer`;
 export const size = { width: 1200, height: 630 };
 export const contentType = "image/png";

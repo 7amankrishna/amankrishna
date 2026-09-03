@@ -1,6 +1,7 @@
 import { notFound } from "next/navigation";
 import { requireAdmin } from "@/lib/admin";
 import { ArticleForm } from "@/components/admin/article-form";
+import { getFontLibrary } from "@/lib/fonts/query";
 import type { Post } from "@/lib/posts";
 
 export const metadata = { title: "Edit article" };
@@ -14,12 +15,11 @@ export default async function EditArticlePage({
   const { id } = await params;
   const { supabase } = await requireAdmin();
 
-  const { data: post } = await supabase
-    .from("posts")
-    .select("*")
-    .eq("id", id)
-    .single();
+  const [{ data: post }, library] = await Promise.all([
+    supabase.from("posts").select("*").eq("id", id).maybeSingle(),
+    getFontLibrary(),
+  ]);
 
   if (!post) notFound();
-  return <ArticleForm post={post as Post} />;
+  return <ArticleForm post={post as Post} library={library} />;
 }

@@ -1,3 +1,4 @@
+import type { Metadata } from "next";
 import { Shell } from "@/components/chrome/shell";
 import { Hero } from "@/components/hero/hero";
 import { About } from "@/components/sections/about";
@@ -9,7 +10,28 @@ import { LinkedInSection } from "@/components/sections/linkedin";
 import { Contact } from "@/components/sections/contact";
 import { Footer } from "@/components/sections/footer";
 import { fetchGitHub } from "@/lib/github";
+import { SITE } from "@/lib/site";
 import { createClient, supabaseConfigured } from "@/lib/supabase/server";
+
+/**
+ * Title, description and Open Graph are inherited from the root layout — only
+ * the self-referencing canonical is declared here.
+ *
+ * It has to live on the page rather than in the layout: a `canonical` in a
+ * layout is inherited by every page that does not set its own, which would have
+ * `/blog` claiming to be `/`. Setting `alternates` also replaces the layout's
+ * copy, so the feed link is repeated.
+ */
+export const metadata: Metadata = {
+  alternates: {
+    canonical: "/",
+    types: {
+      "application/rss+xml": [
+        { url: "/feed.xml", title: `${SITE.blog.title} — ${SITE.name}` },
+      ],
+    },
+  },
+};
 
 // Revalidate hourly so GitHub stats stay fresh.
 export const revalidate = 3600;
