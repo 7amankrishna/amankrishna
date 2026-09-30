@@ -53,6 +53,44 @@ export function websiteJsonLd(): JsonLd {
   };
 }
 
+export function portfolioWebsiteJsonLd(input: {
+  canonical: string;
+  title: string;
+  description: string;
+  image?: string | null;
+}): JsonLd {
+  const node = websiteJsonLd();
+  node["@id"] = `${input.canonical}/#website`;
+  node.url = input.canonical;
+  node.name = input.title;
+  node.description = input.description;
+  if (input.image) node.image = input.image;
+  return node;
+}
+
+export function projectJsonLd(input: {
+  canonical: string;
+  title: string;
+  description: string;
+  image?: string | null;
+  tags?: string[];
+  year?: string;
+}): JsonLd {
+  const node: JsonLd = {
+    "@type": "CreativeWork",
+    "@id": `${input.canonical}#project`,
+    url: input.canonical,
+    name: input.title,
+    description: input.description,
+    author: { "@id": PERSON_ID },
+    isPartOf: { "@id": `${SITE.url}/#website` },
+  };
+  if (input.image) node.image = input.image;
+  if (input.tags?.length) node.keywords = input.tags;
+  if (input.year) node.dateCreated = input.year;
+  return node;
+}
+
 /** The blog as a collection, for the `/blog` index. */
 export function blogJsonLd(): JsonLd {
   return {

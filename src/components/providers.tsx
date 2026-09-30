@@ -5,7 +5,7 @@ import { ThemeProvider } from "next-themes";
 import Lenis from "lenis";
 
 /**
- * Global client providers: theme (dark default) + Lenis smooth scrolling.
+ * Global client providers: persisted light/dark/system theme + Lenis scrolling.
  * Lenis is skipped when the user prefers reduced motion.
  */
 export function Providers({ children }: { children: ReactNode }) {
@@ -29,9 +29,10 @@ export function Providers({ children }: { children: ReactNode }) {
   return (
     <ThemeProvider
       attribute="class"
-      defaultTheme="dark"
-      enableSystem={false}
-      value={{ dark: "dark", light: "light" }}
+      defaultTheme="system"
+      enableSystem
+      storageKey="aman-digital-lab-theme"
+      value={{ dark: "dark", light: "light", system: "system" }}
     >
       {children}
     </ThemeProvider>

@@ -27,7 +27,7 @@ export async function saveProject(
   if (!title) return { ok: false, message: "Title is required." };
   if (!description) return { ok: false, message: "Description is required." };
 
-  const payload = { title, description, url, repo, tags, published, sort_order: sortOrder };
+  const payload = { title, description, url, repo, tags, published, state: published ? "published" : "draft", sort_order: sortOrder };
   const query = id
     ? supabase.from("projects").update(payload).eq("id", id)
     : supabase.from("projects").insert(payload);

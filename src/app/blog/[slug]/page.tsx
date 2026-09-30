@@ -216,7 +216,7 @@ export default async function ArticlePage({ params }: { params: Params }) {
         )}
       />
 
-      <main className="mx-auto max-w-3xl px-6 py-24">
+      <main className="mx-auto max-w-5xl px-6 py-20 sm:py-28">
         {/* Visible trail matching the BreadcrumbList above — Google expects
             the markup and the page to agree. */}
         <nav aria-label="Breadcrumb" className="mb-10">
@@ -239,8 +239,8 @@ export default async function ArticlePage({ params }: { params: Params }) {
           </ol>
         </nav>
 
-        <article>
-          <header className="mb-10">
+        <article className="mx-auto max-w-3xl">
+          <header className="mb-14 border-b border-line pb-12">
             <div className="mb-3 flex flex-wrap items-center gap-x-4 gap-y-2 font-mono text-xs text-muted">
               {published && (
                 <span className="inline-flex items-center gap-2">
@@ -256,7 +256,7 @@ export default async function ArticlePage({ params }: { params: Params }) {
               )}
             </div>
 
-            <h1 className="text-4xl font-semibold tracking-tight sm:text-5xl">
+            <h1 className="font-serif text-4xl leading-tight tracking-tight sm:text-6xl">
               {post.title}
             </h1>
 
@@ -284,7 +284,7 @@ export default async function ArticlePage({ params }: { params: Params }) {
               <img
                 src={post.cover_image}
                 alt=""
-                className="mt-8 w-full rounded-2xl border border-line"
+                className="mt-10 w-full border border-line"
               />
             )}
           </header>
@@ -297,7 +297,7 @@ export default async function ArticlePage({ params }: { params: Params }) {
         </article>
 
         {/* ---- author ------------------------------------------------------ */}
-        <aside className="glass mt-16 flex flex-col gap-4 p-6 sm:flex-row sm:items-center sm:justify-between">
+        <aside className="mx-auto mt-16 flex max-w-3xl flex-col gap-4 border-y border-line py-8 sm:flex-row sm:items-center sm:justify-between">
           <div>
             <p className="eyebrow mb-1">Written by</p>
             <p className="text-lg font-medium">{SITE.author.name}</p>
@@ -333,7 +333,7 @@ export default async function ArticlePage({ params }: { params: Params }) {
 
         {/* ---- related ----------------------------------------------------- */}
         {related.length > 0 && (
-          <section className="mt-16" aria-labelledby="related-heading">
+          <section className="mx-auto mt-16 max-w-3xl" aria-labelledby="related-heading">
             <h2 id="related-heading" className="eyebrow mb-4">
               Related reading
             </h2>
@@ -342,7 +342,7 @@ export default async function ArticlePage({ params }: { params: Params }) {
                 <li key={entry.slug}>
                   <Link
                     href={`${SITE.blog.base}/${entry.slug}`}
-                    className="g-border block p-5 transition-transform hover:-translate-y-0.5"
+                    className="block border-b border-line py-5 transition-colors hover:text-violet"
                   >
                     <p className="font-medium">{entry.title}</p>
                     {entry.excerpt && (
@@ -360,13 +360,13 @@ export default async function ArticlePage({ params }: { params: Params }) {
         {/* ---- prev / next -------------------------------------------------- */}
         <nav
           aria-label="More articles"
-          className="mt-16 grid gap-3 border-t border-line pt-8 sm:grid-cols-2"
+          className="mx-auto mt-16 grid max-w-3xl gap-6 border-t border-line pt-8 sm:grid-cols-2"
         >
           {older ? (
             <Link
               href={`${SITE.blog.base}/${older.slug}`}
               rel="prev"
-              className="g-border group p-5"
+              className="group py-5"
             >
               <span className="mb-1 inline-flex items-center gap-2 font-mono text-xs text-muted">
                 <ArrowLeft className="size-3.5 transition-transform group-hover:-translate-x-0.5" />
@@ -382,7 +382,7 @@ export default async function ArticlePage({ params }: { params: Params }) {
             <Link
               href={`${SITE.blog.base}/${newer.slug}`}
               rel="next"
-              className="g-border group p-5 sm:text-right"
+              className="group py-5 sm:text-right"
             >
               <span className="mb-1 inline-flex items-center gap-2 font-mono text-xs text-muted">
                 Newer
@@ -393,7 +393,7 @@ export default async function ArticlePage({ params }: { params: Params }) {
           )}
         </nav>
 
-        <p className="mt-10 text-sm">
+        <p className="mx-auto mt-10 max-w-3xl text-sm">
           <Link
             href={SITE.blog.base}
             className="inline-flex items-center gap-2 text-muted transition-colors hover:text-fg"

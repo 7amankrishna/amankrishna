@@ -12,10 +12,10 @@ export function GitHubSection({ data }: { data: GitHubData }) {
   const { profile, repos, totalStars, languages } = data;
 
   return (
-    <Section id="github" eyebrow="05 — Open Source" title="Live from GitHub.">
+    <Section id="github" eyebrow="Open source / GitHub" title="The work, in the open.">
       {/* profile stat strip */}
       <StaggerItem>
-        <div className="g-border mb-6 flex flex-wrap items-center gap-6 p-6">
+        <div className="mb-6 flex flex-wrap items-center gap-6 border-y border-line py-6">
           {profile ? (
             <>
               <Image
@@ -40,7 +40,7 @@ export function GitHubSection({ data }: { data: GitHubData }) {
                 </span>
                 <span className="flex items-center gap-2 text-muted">
                   <Star className="size-4 text-cyan" />
-                  {totalStars} stars
+                   {totalStars} recent-repo stars
                 </span>
               </div>
             </>
@@ -74,14 +74,14 @@ export function GitHubSection({ data }: { data: GitHubData }) {
       )}
 
       {/* latest repos */}
-      <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
+      <div className="grid gap-x-10 gap-y-4 sm:grid-cols-2">
         {repos.map((r) => (
           <StaggerItem key={r.name}>
             <a
               href={r.html_url}
               target="_blank"
               rel="noopener noreferrer"
-              className="glass block h-full p-5 transition-all hover:-translate-y-1 hover:border-cyan/50"
+              className="block h-full border-t border-line py-5 transition-colors hover:border-accent"
             >
               <div className="mb-2 flex items-center gap-2">
                 <GitFork className="size-4 shrink-0 text-violet" />

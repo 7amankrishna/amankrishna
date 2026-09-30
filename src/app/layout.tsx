@@ -4,6 +4,7 @@ import { Analytics } from "@vercel/analytics/react";
 import { Providers } from "@/components/providers";
 import { SITE as CANONICAL } from "@/lib/site";
 import { SITE } from "@/lib/utils";
+import { getPortfolioData } from "@/lib/portfolio";
 import "./globals.css";
 
 /**
@@ -32,7 +33,7 @@ const geistMono = Geist_Mono({
   subsets: ["latin"],
 });
 
-export const metadata: Metadata = {
+const baseMetadata: Metadata = {
   metadataBase: new URL(SITE.url),
   title: {
     default: `${SITE.name} — AI/ML & Full-Stack Developer`,
@@ -76,8 +77,31 @@ export const metadata: Metadata = {
   manifest: "/manifest.webmanifest",
 };
 
+/** The CMS owns editable SEO fields; static identity remains the safe fallback. */
+export async function generateMetadata(): Promise<Metadata> {
+  try {
+    const portfolio = await getPortfolioData();
+    const seo = portfolio.settings.seo;
+    const title = seo.title || `${SITE.name} — AI/ML & Full-Stack Developer`;
+    const description = seo.description || String(baseMetadata.description ?? "");
+    const canonical = seo.canonicalUrl || SITE.url;
+    const images = seo.ogImage ? [{ url: seo.ogImage, alt: title }] : undefined;
+    return {
+      ...baseMetadata,
+      title: { default: title, template: `%s — ${portfolio.settings.profile.name || SITE.name}` },
+      description,
+      alternates: { ...baseMetadata.alternates, canonical },
+      openGraph: { ...baseMetadata.openGraph, url: canonical, title, description, ...(images ? { images } : {}) },
+      twitter: { ...baseMetadata.twitter, title, description, ...(seo.twitterImage ? { images: [seo.twitterImage] } : images ? { images: [seo.ogImage] } : {}) },
+      robots: { index: seo.robotsIndex !== "noindex", follow: seo.robotsFollow !== "nofollow" },
+    };
+  } catch {
+    return baseMetadata;
+  }
+}
+
 export const viewport: Viewport = {
-  themeColor: "#050505",
+  themeColor: "#E8E6D9",
   width: "device-width",
   initialScale: 1,
 };

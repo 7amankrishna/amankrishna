@@ -6,8 +6,9 @@ import { submitContact, type ContactState } from "@/app/actions/contact";
 import { SITE } from "@/lib/utils";
 import { Mail, Send, Loader2, CheckCircle2, AlertCircle } from "lucide-react";
 import { Github, Linkedin } from "@/components/ui/brand-icons";
+import type { PortfolioSettings } from "@/lib/portfolio-types";
 
-const channels = [
+const defaultChannels = [
   { icon: Mail, label: "Email", value: SITE.email, href: `mailto:${SITE.email}` },
   { icon: Github, label: "GitHub", value: "github.com/7amankrishna", href: SITE.github },
   { icon: Linkedin, label: "LinkedIn", value: "in/7amankrishna", href: SITE.linkedin },
@@ -16,14 +17,15 @@ const channels = [
 const inputClass =
   "w-full rounded-xl border border-line bg-surface px-4 py-3 text-sm text-fg placeholder:text-muted/60 transition-colors focus:border-violet/60 focus:outline-none";
 
-export function Contact() {
+export function Contact({ settings }: { settings?: PortfolioSettings }) {
+  const channels = settings ? [{ icon: Mail, label: "Email", value: settings.profile.email, href: `mailto:${settings.profile.email}` }, ...settings.socials.map((s) => ({ icon: Mail, label: s.label, value: s.label, href: s.url }))].filter((c) => c.value) : defaultChannels;
   const [state, action, pending] = useActionState<ContactState, FormData>(
     submitContact,
     null,
   );
 
   return (
-    <Section id="contact" eyebrow="07 — Contact" title="Build something together.">
+       <Section id="contact" eyebrow="07 / Contact" title={settings?.hero.secondaryLabel ?? "Build something together."}>
       <div className="grid gap-10 lg:grid-cols-2">
         {/* channels */}
         <div className="space-y-4">
@@ -60,6 +62,10 @@ export function Contact() {
                 <input name="email" type="email" required maxLength={200} placeholder="you@example.com" className={inputClass} />
               </label>
             </div>
+            <label className="block">
+              <span className="mb-1.5 block text-sm text-muted">Subject</span>
+              <input name="subject" maxLength={200} placeholder="What are you building?" className={inputClass} />
+            </label>
             <label className="block">
               <span className="mb-1.5 block text-sm text-muted">Message</span>
               <textarea

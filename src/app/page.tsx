@@ -3,15 +3,16 @@ import { Shell } from "@/components/chrome/shell";
 import { Hero } from "@/components/hero/hero";
 import { About } from "@/components/sections/about";
 import { Skills } from "@/components/sections/skills";
-import { Projects, defaultProjects, type Project } from "@/components/sections/projects";
+import { Projects } from "@/components/sections/projects";
 import { Experience } from "@/components/sections/experience";
 import { GitHubSection } from "@/components/sections/github";
-import { LinkedInSection } from "@/components/sections/linkedin";
 import { Contact } from "@/components/sections/contact";
 import { Footer } from "@/components/sections/footer";
 import { fetchGitHub } from "@/lib/github";
 import { SITE } from "@/lib/site";
-import { createClient, supabaseConfigured } from "@/lib/supabase/server";
+import { getPortfolioData as getPortfolio } from "@/lib/portfolio";
+import type { SectionKey } from "@/lib/portfolio-types";
+import type { ReactNode } from "react";
 
 /**
  * Title, description and Open Graph are inherited from the root layout — only
@@ -36,49 +37,31 @@ export const metadata: Metadata = {
 // Revalidate hourly so GitHub stats stay fresh.
 export const revalidate = 3600;
 
-// Alternate banner gradients cycled across Supabase-managed projects.
-const gradients = [
-  "from-violet/30 via-blue/20 to-transparent",
-  "from-cyan/30 via-blue/20 to-transparent",
-  "from-blue/30 via-violet/20 to-transparent",
-];
-
-/** Published projects from Supabase; falls back to the built-in list. */
-async function fetchProjects(): Promise<Project[]> {
-  if (!supabaseConfigured()) return defaultProjects;
-  const supabase = await createClient();
-  const { data } = await supabase
-    .from("projects")
-    .select("title,description,url,repo,tags")
-    .eq("published", true)
-    .order("sort_order", { ascending: true });
-  if (!data || data.length === 0) return defaultProjects;
-
-  return data.map((p, i) => ({
-    title: p.title,
-    description: p.description,
-    url: p.url ?? undefined,
-    repo: p.repo ?? undefined,
-    tags: p.tags ?? [],
-    gradient: gradients[i % gradients.length],
-    urlLabel: "Visit Website",
-  }));
-}
-
 export default async function Home() {
-  const [github, projects] = await Promise.all([fetchGitHub(), fetchProjects()]);
+  const [github, portfolio] = await Promise.all([fetchGitHub(), getPortfolio()]);
+  const selectedProjects = portfolio.projects.filter((project) => project.featured);
+  const content: Record<SectionKey, ReactNode> = {
+    hero: <Hero data={portfolio.settings} />,
+    about: <About data={portfolio.settings} />,
+    philosophy: portfolio.settings.philosophy ? <section id="philosophy" className="mx-auto max-w-6xl px-6 pb-20"><p className="eyebrow mb-5">Working philosophy</p><p className="editorial-lede max-w-3xl">{portfolio.settings.philosophy}</p></section> : null,
+    skills: <Skills skills={portfolio.skills} />,
+    projects: <Projects projects={selectedProjects.length ? selectedProjects : portfolio.projects} />,
+    journey: <Experience entries={portfolio.journey} />,
+    building: <LabNotes building={portfolio.building} status={[]} mode="building" />,
+    status: <LabNotes building={[]} status={portfolio.settings.currentStatus} mode="status" />,
+    github: <GitHubSection data={github} />,
+    contact: <Contact settings={portfolio.settings} />,
+  };
+  const sections = portfolio.settings.sections.length ? [...portfolio.settings.sections].sort((a, b) => a.order - b.order).filter((s) => s.visible).map((s) => s.id) : Object.keys(content) as SectionKey[];
 
   return (
-    <Shell>
-      <Hero />
-      <About />
-      <Skills />
-      <Projects projects={projects} />
-      <Experience />
-      <GitHubSection data={github} />
-      <LinkedInSection />
-      <Contact />
-      <Footer />
+    <Shell settings={portfolio.settings}>
+      {sections.map((id) => <div key={id}>{content[id]}</div>)}
+      <Footer settings={portfolio.settings} />
     </Shell>
   );
+}
+
+function LabNotes({ building, status, mode }: { building: { id: string; title: string; description: string }[]; status: string[]; mode: "building" | "status" }) {
+  return <section id={mode} className="mx-auto max-w-6xl px-6 pb-20">{mode === "building" ? <div className="editorial-note"><p className="eyebrow">05 / Building</p><h2>Currently in the lab.</h2>{building.length ? building.map((item) => <p key={item.id} className="mt-4 text-muted"><strong className="text-fg">{item.title}</strong><br />{item.description}</p>) : <p className="mt-4 text-muted">New notes will appear here as they are published.</p>}</div> : <div className="editorial-note"><p className="eyebrow">06 / Status</p><h2>Where things stand.</h2>{status.length ? status.map((item) => <p key={item} className="mt-4 text-muted">{item}</p>) : <p className="mt-4 text-muted">Status updates will appear here as they are published.</p>}</div>}</section>;
 }
