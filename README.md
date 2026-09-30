@@ -84,13 +84,10 @@ stores the font families it actually uses.
 ## Supabase setup
 
 1. Create a project at [supabase.com](https://supabase.com).
-2. In **SQL Editor**, run everything in [`supabase/schema.sql`](supabase/schema.sql), then apply [`supabase/migrations/20260930_portfolio_cms.sql`](supabase/migrations/20260930_portfolio_cms.sql).
-   This creates the existing blog/contact/project tables and the additive
-   portfolio CMS (`portfolio_settings`, `skills`, `journey_entries`,
-   `building_entries`, project case-study fields and portfolio media) with
-   row-level security. Public visitors only receive published content; the
-   owner-only command center at `/admin` manages homepage settings, projects,
-   skills, journey, building notes, media, messages and articles.
+2. In **SQL Editor**, run everything in [`supabase/schema.sql`](supabase/schema.sql).
+   This creates `contact_messages`, `projects`, and `posts` with row-level
+   security (public can submit messages / read published projects; only
+   authenticated users can read messages or manage content).
 3. In **Project Settings → API**, copy the URL and anon key into `.env.local`:
 
    ```

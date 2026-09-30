@@ -3,7 +3,6 @@ import { resolveBodyHtml } from "@/lib/content/blocks-to-html";
 import type { Post } from "@/lib/posts";
 import { resolveSeo, type ResolvedSeo } from "@/lib/seo/fields";
 import { SITE, absoluteUrl, postUrl } from "@/lib/site";
-import type { PortfolioProject, PortfolioSettings } from "@/lib/portfolio-types";
 
 /**
  * The bridge between what the author typed and what Next actually emits.
@@ -132,111 +131,4 @@ export function articleMetadata(post: ArticleSeoInput): Metadata {
       ...(image ? { images: [image] } : {}),
     },
   };
-}
-
-/** The SEO fields exposed by a published portfolio project. */
-export type ProjectSeoInput = {
-  slug: string;
-  title: string;
-  description?: string | null;
-  short_description?: string | null;
-  seo_title?: string | null;
-  seo_description?: string | null;
-  image?: string | null;
-  image_alt?: string | null;
-  updated_at?: string | null;
-};
-
-export function projectMetadata(project: ProjectSeoInput): Metadata {
-  const seo = resolveSeo({
-    title: project.title,
-    seoTitle: project.seo_title,
-    seoDescription: project.seo_description,
-    excerpt: project.short_description || project.description,
-  });
-  const canonical = `${SITE.url}/projects/${project.slug}`;
-  const image = project.image?.trim() ? absoluteUrl(project.image) : undefined;
-
-  return {
-    title: { absolute: seo.title },
-    description: seo.description || undefined,
-    alternates: { canonical },
-    openGraph: {
-      type: "website",
-      url: canonical,
-      siteName: SITE.name,
-      locale: SITE.locale,
-      title: seo.ogTitle,
-      description: seo.ogDescription || undefined,
-      ...(image ? { images: [{ url: image, alt: project.image_alt || project.title }] } : {}),
-    },
-    twitter: {
-      card: "summary_large_image",
-      title: seo.twitterTitle,
-      description: seo.twitterDescription || undefined,
-      ...(image ? { images: [image] } : {}),
-    },
-  };
-}
-
-export type PortfolioSeo = {
-  resolved: ResolvedSeo;
-  canonical: string;
-  image: string | null;
-  index: boolean;
-  follow: boolean;
-};
-
-/** One resolver for CMS homepage SEO, metadata, sitemap URLs, and JSON-LD inputs. */
-export function resolvePortfolioSeo(settings: PortfolioSettings): PortfolioSeo {
-  const resolved = resolveSeo({
-    title: settings.seo.title || settings.profile.name,
-    seoTitle: settings.seo.title,
-    seoDescription: settings.seo.description,
-  });
-  const rawCanonical = settings.seo.canonicalUrl?.trim();
-  const canonical = rawCanonical && /^https?:\/\//i.test(rawCanonical)
-    ? rawCanonical.replace(/\/+$/, "")
-    : SITE.url;
-  const rawImage = settings.seo.ogImage?.trim() || settings.seo.twitterImage?.trim() || "";
-  return {
-    resolved,
-    canonical,
-    image: rawImage ? absoluteUrl(rawImage) : null,
-    index: settings.seo.robotsIndex !== "noindex",
-    follow: settings.seo.robotsFollow !== "nofollow",
-  };
-}
-
-export function portfolioMetadata(settings: PortfolioSettings): Metadata {
-  const seo = resolvePortfolioSeo(settings);
-  return {
-    title: { default: seo.resolved.title, template: `%s — ${SITE.name}` },
-    description: seo.resolved.description || undefined,
-    alternates: { canonical: seo.canonical },
-    robots: {
-      index: seo.index,
-      follow: seo.follow,
-      googleBot: { index: seo.index, follow: seo.follow },
-    },
-    openGraph: {
-      type: "website",
-      url: seo.canonical,
-      siteName: SITE.name,
-      locale: SITE.locale,
-      title: seo.resolved.ogTitle,
-      description: seo.resolved.ogDescription || undefined,
-      ...(seo.image ? { images: [{ url: seo.image, alt: seo.resolved.ogTitle }] } : {}),
-    },
-    twitter: {
-      card: "summary_large_image",
-      title: seo.resolved.twitterTitle,
-      description: seo.resolved.twitterDescription || undefined,
-      ...(seo.image ? { images: [seo.image] } : {}),
-    },
-  };
-}
-
-export function projectCanonical(project: Pick<PortfolioProject, "slug">, origin = SITE.url): string {
-  return `${origin.replace(/\/+$/, "")}/projects/${project.slug}`;
 }

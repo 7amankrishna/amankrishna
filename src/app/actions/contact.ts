@@ -15,14 +15,15 @@ export async function submitContact(
   const name = String(formData.get("name") ?? "").trim();
   const email = String(formData.get("email") ?? "").trim();
   const message = String(formData.get("message") ?? "").trim();
-  const subject = String(formData.get("subject") ?? "").trim();
 
   if (!name || !email || !message) {
     return { ok: false, message: "Please fill in every field." };
   }
-  if (name.length > 100 || email.length > 200 || subject.length > 200 || message.length > 5000) return { ok: false, message: "One or more fields are too long." };
   if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) {
     return { ok: false, message: "That email address doesn't look right." };
+  }
+  if (message.length > 5000) {
+    return { ok: false, message: "Message is too long (5000 characters max)." };
   }
 
   if (!supabaseConfigured()) {
@@ -36,7 +37,7 @@ export async function submitContact(
   const supabase = await createClient();
   const { error } = await supabase
     .from("contact_messages")
-    .insert({ name, email, subject, message });
+    .insert({ name, email, message });
 
   if (error) {
     console.error("contact insert failed:", error.message);

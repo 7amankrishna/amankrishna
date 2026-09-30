@@ -14,30 +14,26 @@ export function Section({
   title,
   children,
   className,
-  label,
-  heading,
 }: {
   id: string;
   eyebrow: string;
   title: string;
   children: ReactNode;
   className?: string;
-  label?: string;
-  heading?: string;
 }) {
   const reduce = useReducedMotion();
 
   return (
-    <section id={id} className={cn("relative mx-auto max-w-6xl scroll-mt-20 border-t border-line px-6 py-20", className)}>
+    <section id={id} className={cn("relative mx-auto max-w-6xl px-6 py-28", className)}>
       <motion.div
         initial={reduce ? false : { opacity: 0, y: 32 }}
         whileInView={{ opacity: 1, y: 0 }}
         viewport={{ once: true, margin: "-80px" }}
         transition={{ duration: 0.6, ease: [0.21, 0.6, 0.35, 1] }}
       >
-        <p className="eyebrow mb-3">{label || eyebrow}</p>
-        <h2 className="mb-12 max-w-3xl text-4xl font-normal tracking-[-0.05em] sm:text-6xl">
-          {heading || title}
+        <p className="eyebrow mb-3">{eyebrow}</p>
+        <h2 className="mb-12 text-3xl font-semibold tracking-tight sm:text-4xl">
+          {title}
         </h2>
       </motion.div>
       <Stagger>{children}</Stagger>

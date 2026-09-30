@@ -168,7 +168,7 @@ export default async function BlogPage({
         )}
       />
 
-      <main className="mx-auto max-w-5xl px-6 py-20 sm:py-28">
+      <main className="mx-auto max-w-3xl px-6 py-24">
         <Link
           href="/"
           className="mb-10 inline-flex items-center gap-2 text-sm text-muted transition-colors hover:text-fg"
@@ -176,13 +176,10 @@ export default async function BlogPage({
           <ArrowLeft className="size-4" /> Home
         </Link>
 
-        <div className="mb-14 max-w-3xl border-b border-line pb-10">
-          <p className="eyebrow mb-3">Writing</p>
-          <h1 className="font-serif text-5xl leading-tight tracking-tight sm:text-7xl">
+        <p className="eyebrow mb-3">Writing</p>
+        <h1 className="mb-6 text-4xl font-semibold tracking-tight">
           {SITE.blog.title}
-          </h1>
-          <p className="mt-5 max-w-xl text-lg leading-relaxed text-muted">Ideas, experiments, and field notes on building with intelligent systems.</p>
-        </div>
+        </h1>
 
         {tags.length > 0 && (
           // Links rather than buttons: each filter is a real, shareable URL, so
@@ -217,20 +214,20 @@ export default async function BlogPage({
         )}
 
         {visible.length === 0 ? (
-          <p className="border-y border-line py-12 text-sm text-muted">
+          <p className="glass border-dashed p-10 text-center text-sm text-muted">
             {active
               ? `No articles tagged “${active}” yet.`
               : "Nothing published yet — first article coming soon."}
           </p>
         ) : (
-          <ul className="divide-y divide-line border-y border-line">
+          <ul className="space-y-4">
             {visible.map((post) => {
               const published = formatDate(post.published_at);
               return (
                 <li key={post.slug}>
                   <Link
                     href={`${SITE.blog.base}/${post.slug}`}
-                    className="group block py-8 transition-colors hover:bg-surface focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-violet sm:px-4"
+                    className="g-border group block p-6 transition-transform hover:-translate-y-0.5"
                   >
                     {published && (
                       <div className="mb-2 flex items-center gap-2 font-mono text-xs text-muted">
@@ -240,7 +237,7 @@ export default async function BlogPage({
                         </time>
                       </div>
                     )}
-                    <h2 className="mb-3 flex items-start justify-between gap-6 font-serif text-2xl tracking-tight sm:text-3xl">
+                    <h2 className="mb-1 flex items-center gap-2 text-xl font-medium">
                       {post.title}
                       <ArrowUpRight
                         className="size-4 text-muted transition-transform group-hover:-translate-y-0.5 group-hover:translate-x-0.5 group-hover:text-cyan"

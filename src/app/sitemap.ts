@@ -23,7 +23,6 @@ import { createClient, supabaseConfigured } from "@/lib/supabase/server";
 export const revalidate = 300;
 
 type SitemapRow = { slug: string; updated_at: string | null };
-type ProjectSitemapRow = { slug: string; updated_at: string | null };
 
 /** `new Date(null)` is 1970, so a missing stamp must become `undefined`. */
 function stamp(value: string | null | undefined): Date | undefined {
@@ -34,7 +33,6 @@ function stamp(value: string | null | undefined): Date | undefined {
 
 export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
   let rows: SitemapRow[] = [];
-  let projects: ProjectSitemapRow[] = [];
 
   if (supabaseConfigured()) {
     const supabase = await createClient();
@@ -45,13 +43,6 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
       .neq("robots_index", "noindex")
       .order("published_at", { ascending: false });
     rows = (data ?? []) as SitemapRow[];
-    const projectResult = await supabase
-      .from("projects")
-      .select("slug, updated_at")
-      .eq("published", true)
-      .eq("state", "published")
-      .order("sort_order", { ascending: true });
-    projects = (projectResult.data ?? []) as ProjectSitemapRow[];
   }
 
   // The index genuinely changed when its newest article did.
@@ -81,16 +72,6 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
       lastModified: stamp(row.updated_at),
       changeFrequency: "monthly",
       priority: 0.6,
-    });
-  }
-
-  for (const project of projects) {
-    if (!project.slug) continue;
-    entries.push({
-      url: `${SITE.url}/projects/${project.slug}`,
-      lastModified: stamp(project.updated_at),
-      changeFrequency: "monthly",
-      priority: 0.7,
     });
   }
 
