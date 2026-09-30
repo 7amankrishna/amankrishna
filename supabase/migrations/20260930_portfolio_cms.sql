@@ -37,6 +37,7 @@ alter table public.projects add column if not exists updated_at timestamptz not 
 alter table public.contact_messages add column if not exists read_at timestamptz;
 alter table public.contact_messages add column if not exists archived_at timestamptz;
 alter table public.contact_messages add column if not exists subject text not null default '' check (char_length(subject) <= 200);
+alter table public.contact_messages add column if not exists subject text not null default '' check (char_length(subject) <= 200);
 
 create unique index if not exists projects_slug_idx on public.projects(slug) where slug is not null;
 create index if not exists portfolio_projects_public_idx on public.projects(published, state, sort_order);
